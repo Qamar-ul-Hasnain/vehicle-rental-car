@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>V-BAR</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100">
+    <section id="auth" class="p-8 flex justify-center items-center h-screen">
+        <div class="bg-white p-6 shadow-lg rounded-lg w-96 text-center">
+            <h2 class="text-xl font-semibold mb-4">Login</h2>
+            <form id="login-form" class="space-y-4">
+                <input type="text" id="login-username" class="w-full p-2 border rounded" placeholder="Username" required>
+                <input type="password" id="login-password" class="w-full p-2 border rounded" placeholder="Password" required>
+                <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded w-full">Login</button>
+            </form>
+        </div>
+    </section>
+    
+    <div id="main-content" class="hidden">
+        <header class="bg-blue-600 text-white p-4 flex justify-between items-center">
+            <h1 class="text-2xl font-bold">V-BAR</h1>
+            <nav>
+                <ul class="flex space-x-4">
+                    <li><a href="#cars" class="hover:underline">Cars</a></li>
+                    <li><a href="#wishlist" class="hover:underline">Wishlist</a></li>
+                    <li><a href="#contact" class="hover:underline">Contact</a></li>
+                </ul>
+            </nav>
+        </header>
+        
+        <section id="cars" class="p-8">
+            <h2 class="text-xl font-semibold mb-4">Available Cars</h2>
+            <div id="car-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+        </section>
+        
+        <section id="wishlist" class="p-8 bg-white shadow-lg rounded-lg mt-8">
+            <h2 class="text-xl font-semibold mb-4">Wishlist</h2>
+            <ul id="wishlist-list" class="list-none space-y-2"></ul>
+        </section>
+        
+        <section id="contact" class="p-8 bg-white shadow-lg rounded-lg mt-8">
+            <h2 class="text-xl font-semibold mb-4">Contact Us</h2>
+            <form class="space-y-4">
+                <div>
+                    <label for="name" class="block text-gray-700">Name</label>
+                    <input type="text" id="name" class="w-full p-2 border rounded" placeholder="Your Name">
+                </div>
+                <div>
+                    <label for="email" class="block text-gray-700">Email</label>
+                    <input type="email" id="email" class="w-full p-2 border rounded" placeholder="Your Email">
+                </div>
+                <div>
+                    <label for="message" class="block text-gray-700">Message</label>
+                    <textarea id="message" class="w-full p-2 border rounded" placeholder="Your Message"></textarea>
+                </div>
+                <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded w-full">Send Message</button>
+            </form>
+        </section>
+    </div>
+    
+    <script>
+        document.getElementById('login-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            document.getElementById('auth').classList.add('hidden');
+            document.getElementById('main-content').classList.remove('hidden');
+            loadCars();
+        });
+
+        const cars = [
+            { name: "Honda Civic", model: "2023", fuel: "Petrol", mileage: "16 km/l", price: 500 },
+            { name: "Toyota Corolla", model: "2022", fuel: "Petrol", mileage: "14 km/l", price: 450 },
+            { name: "Ford Mustang", model: "2021", fuel: "Petrol", mileage: "10 km/l", price: 800 },
+            { name: "BMW X5", model: "2023", fuel: "Diesel", mileage: "12 km/l", price: 900 },
+            { name: "Suzuki Alto", model: "2020", fuel: "Petrol", mileage: "18 km/l", price: 300 },
+            { name: "Tesla Model 3", model: "2023", fuel: "Electric", mileage: "450 km/full charge", price: 1200 }
+        ];
+
+        let wishlist = [];
+
+        function loadCars() {
+            let carList = document.getElementById('car-list');
+            carList.innerHTML = '';
+            cars.forEach(car => {
+                let carDiv = document.createElement('div');
+                carDiv.classList.add('car-card', 'bg-white', 'p-4', 'shadow-lg', 'rounded-lg');
+                carDiv.innerHTML = `
+                    <h3 class="text-lg font-semibold">${car.name} (${car.model})</h3>
+                    <p class="text-gray-700">Fuel Type: ${car.fuel}</p>
+                    <p class="text-gray-700">Mileage: ${car.mileage}</p>
+                    <p class="text-gray-700 font-bold">Price: Rs ${car.price}/hour</p>
+                    <button class="bg-green-600 text-white px-4 py-2 rounded mt-2 w-full" onclick="bookCar('${car.name}', ${car.price})">Book Now</button>
+                    <button class="bg-yellow-500 text-white px-4 py-2 rounded mt-2 w-full" onclick="addToWishlist('${car.name}')">Add to Wishlist</button>
+                `;
+                carList.appendChild(carDiv);
+            });
+        }
+
+        function bookCar(carName, carPrice) {
+            let hours = prompt(`Enter the number of hours you want to book ${carName}:`);
+            if (hours && !isNaN(hours) && hours > 0) {
+                let totalPrice = hours * carPrice;
+                alert(`You have booked ${carName} for ${hours} hours. Total price: Rs ${totalPrice}`);
+            } else {
+                alert("Invalid input. Please enter a valid number of hours.");
+            }
+        }
+
+        function addToWishlist(carName) {
+            if (!wishlist.includes(carName)) {
+                wishlist.push(carName);
+                updateWishlist();
+            }
+        }
+
+        function removeFromWishlist(carName) {
+            wishlist = wishlist.filter(car => car !== carName);
+            updateWishlist();
+        }
+
+        function updateWishlist() {
+            let wishlistList = document.getElementById('wishlist-list');
+            wishlistList.innerHTML = '';
+            wishlist.forEach(car => {
+                let listItem = document.createElement('li');
+                listItem.innerHTML = `${car} <button onclick="removeFromWishlist('${car}')" class="bg-red-500 text-white px-2 py-1 rounded">Remove</button>`;
+                wishlistList.appendChild(listItem);
+            });
+        }
+    </script>
+</body>
+</html>
